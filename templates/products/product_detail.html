@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+        {% else %}
+        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 400px;">
+            <span class="text-muted">Изображение отсутствует</span>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <h1>{{ product.name }}</h1>
+        <p class="text-muted">Категория: {{ product.category.name }}</p>
+        <p class="h3 text-primary">{{ product.price }} руб.</p>
+
+        <div class="mb-3">
+            {% if product.get_available_quantity > 0 %}
+                <span class="badge bg-success">В наличии: {{ product.get_available_quantity }} шт.</span>
+            {% else %}
+                <span class="badge bg-danger">Нет в наличии</span>
+            {% endif %}
+        </div>
+
+        <p>{{ product.description }}</p>
+
+        <div class="mt-4">
+            {% if user.is_authenticated %}
+                {% if product.get_available_quantity > 0 %}
+                    <a href="{% url 'cart:add_to_cart' product.id %}" class="btn btn-primary btn-lg">Добавить в корзину</a>
+                {% else %}
+                    <button class="btn btn-secondary btn-lg" disabled>Нет в наличии</button>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'users:login' %}" class="btn btn-primary btn-lg">Войдите для покупки</a>
+            {% endif %}
+            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary btn-lg">Назад к каталогу</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
