@@ -48,14 +48,14 @@ class Command(BaseCommand):
                 self.create_product(row)
     
     def create_product(self, data):
-        # Получаем или создаем категорию
+        # Получаем или создаем категорию.
         category, created = Category.objects.get_or_create(
             name=data['category'],
             defaults={
                 'slug': data.get('category_slug', data['category'].lower())}
         )
         
-        # Создаем товар
+        # Создаем товар.
         product, created = Product.objects.get_or_create(
             name=data['name'],
             defaults={
@@ -66,7 +66,7 @@ class Command(BaseCommand):
             }
         )
         
-        # Создаем остатки
+        # Создаем остатки.
         stock, created = Stock.objects.get_or_create(
             product=product,
             defaults={

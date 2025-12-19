@@ -1,11 +1,73 @@
-from django.urls import path
-from . import views
+{% extends 'base.html' %}
 
-app_name = 'products'
+{% block title %}Корзина покупок{% endblock %}
 
-urlpatterns = [
-    path('', views.product_list, name='product_list'),
-    path('category/<slug:category_slug>/', views.product_list, name='products_by_category'),
-    path('product/<slug:slug>/', views.product_detail, name='product_detail'),
-    path('search/', views.product_search, name='product_search'),
-]
+{% block content %}
+<h1>Корзина покупок</h1>
+
+{% if cart.items.all %}
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Товар</th>
+                <th>Цена</th>
+                <th>Количество</th>
+                <th>Сумма</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart.items.all %}
+            <tr>
+                <td>
+                    <div class="d-flex align-items-center">
+                        {% if item.product.image %}
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"
+                             style="width: 50px; height: 50px; object-fit: cover;" class="me-3">
+                        {% endif %}
+                        <div>
+                            <h6 class="mb-0">{{ item.product.name }}</h6>
+                            <small class="text-muted">{{ item.product.category.name }}</small>
+                        </div>
+                    </div>
+                </td>
+                <td>{{ item.product.price }} руб.</td>
+                <td>
+                    <form method="post" action="{% url 'cart:update_cart' item.product.id %}" class="d-flex align-items-center">
+                        {% csrf_token %}
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.get_available_quantity }}"
+                               class="form-control form-control-sm" style="width: 80px;">
+                        <button type="submit" class="btn btn-sm btn-outline-primary ms-2">Обновить</button>
+                    </form>
+                </td>
+                <td>{{ item.total_price }} руб.</td>
+                <td>
+                    <a href="{% url 'cart:remove_from_cart' item.product.id %}" class="btn btn-sm btn-outline-danger">Удалить</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3"><strong>Итого:</strong></td>
+                <td colspan="2"><strong>{{ cart.total_price }} руб.</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<div class="d-flex justify-content-between mt-4">
+    <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary">Продолжить покупки</a>
+    <div>
+        <a href="{% url 'orders:create_order' %}" class="btn btn-success btn-lg">Оформить заказ</a>
+    </div>
+</div>
+{% else %}
+<div class="text-center py-5">
+    <h3>Ваша корзина пуста</h3>
+    <p>Добавьте товары из каталога, чтобы сделать покупку.</p>
+    <a href="{% url 'products:product_list' %}" class="btn btn-primary">Перейти к покупкам</a>
+</div>
+{% endif %}
+{% endblock %}

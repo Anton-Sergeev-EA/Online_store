@@ -40,11 +40,46 @@
         </tbody>
     </table>
 </div>
+
+{% if paginator.num_pages > 1 %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if orders.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page=1">Первая</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ orders.previous_page_number }}">Назад</a>
+        </li>
+        {% endif %}
+
+        {% for num in paginator.page_range %}
+            {% if orders.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > orders.number|add:'-3' and num < orders.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if orders.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ orders.next_page_number }}">Вперед</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ paginator.num_pages }}">Последняя</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
 {% else %}
 <div class="text-center py-5">
     <h3>У вас еще нет заказов</h3>
     <p>Сделайте свой первый заказ в нашем магазине!</p>
-    <a href="{% url 'product_list' %}" class="btn btn-primary">Перейти к покупкам</a>
+    <a href="{% url 'products:product_list' %}" class="btn btn-primary">Перейти к покупкам</a>
 </div>
 {% endif %}
 {% endblock %}
